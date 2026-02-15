@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>BodyScan — V2</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">BS</div>
+      <div>
+        <div class="title">BodyScan</div>
+        <div class="subtitle">PWA • Protótipo V2 (testes)</div>
+      </div>
+    </div>
+
+    <div class="topActions">
+      <button id="btnTutorial" class="btn secondary" type="button">Tutorial</button>
+      <button id="btnInstall" class="btn secondary hidden" type="button">Instalar</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <div class="row between">
+        <div>
+          <h2>Perfil</h2>
+          <p class="muted">Crie perfis para testar com você, esposa, clientes, etc.</p>
+        </div>
+
+        <div class="profileBox">
+          <select id="profileSelect" class="select"></select>
+          <button id="btnAddProfile" class="btn primary" type="button">Novo perfil</button>
+          <button id="btnDeleteProfile" class="btn danger" type="button">Excluir</button>
+        </div>
+      </div>
+
+      <div id="profileMsg" class="msg hidden"></div>
+    </section>
+
+    <section class="tabs">
+      <button class="tab active" data-tab="avaliacao">Avaliação</button>
+      <button class="tab" data-tab="historico">Histórico</button>
+      <button class="tab" data-tab="config">Config</button>
+    </section>
+
+    <!-- AVALIAÇÃO -->
+    <section id="tab-avaliacao" class="card tabPane">
+      <h2>1) Seus dados</h2>
+      <div class="grid">
+        <label class="field">
+          <span>Sexo (biológico)</span>
+          <select id="sexo">
+            <option value="M">Masculino</option>
+            <option value="F">Feminino</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Idade (anos)</span>
+          <input id="idade" type="number" inputmode="numeric" min="18" max="90" value="30" />
+        </label>
+
+        <label class="field">
+          <span>Altura</span>
+          <input id="altura" type="text" inputmode="decimal" placeholder="Ex.: 175 ou 1,75" value="175" />
+          <small class="hint">Aceita cm ou m (ex.: 175 / 1,75). O app converte automaticamente.</small>
+        </label>
+
+        <label class="field">
+          <span>Peso (kg)</span>
+          <input id="peso" type="number" inputmode="decimal" min="30" max="250" value="80" />
+        </label>
+      </div>
+
+      <div class="row">
+        <label class="toggle">
+          <input id="toggleSalvarFotos" type="checkbox" />
+          <span>Salvar fotos localmente (somente para testes; pode ocupar espaço)</span>
+        </label>
+      </div>
+
+      <details class="details">
+        <summary>Ver fórmulas usadas</summary>
+        <div class="detailsBody">
+          <ul>
+            <li><strong>IMC</strong> = peso / altura²</li>
+            <li><strong>% Gordura (Deurenberg, adultos)</strong> = 1,20×IMC + 0,23×idade − 10,8×sexo_num − 5,4 (sexo_num: 1 masc, 0 fem)</li>
+            <li><strong>Massa gorda</strong> = peso×(%G/100); <strong>Massa magra</strong> = peso − massa gorda</li>
+            <li><strong>IMG</strong> = massa gorda / altura²</li>
+          </ul>
+          <p class="muted">Aviso: estimativa populacional; não é diagnóstico.</p>
+        </div>
+      </details>
+
+      <div id="msgValidacao" class="msg hidden"></div>
+
+      <h2 class="mt">2) Fotos (opcional)</h2>
+      <p class="muted">
+        Para melhor confiabilidade: boa luz, fundo neutro, corpo inteiro, câmera na altura do umbigo/peito, distância ~2–3m.
+      </p>
+
+      <div class="photoGrid">
+        <div class="photoCard">
+          <div class="photoTitle">Frente</div>
+          <input id="fotoFrente" type="file" accept="image/*" capture="environment" />
+          <img id="prevFrente" class="preview hidden" alt="Prévia frente" />
+          <div id="scoreFrente" class="badge hidden"></div>
+        </div>
+
+        <div class="photoCard">
+          <div class="photoTitle">Costas</div>
+          <input id="fotoCostas" type="file" accept="image/*" capture="environment" />
+          <img id="prevCostas" class="preview hidden" alt="Prévia costas" />
+          <div id="scoreCostas" class="badge hidden"></div>
+        </div>
+
+        <div class="photoCard">
+          <div class="photoTitle">Perfil esquerdo</div>
+          <input id="fotoPerfilE" type="file" accept="image/*" capture="environment" />
+          <img id="prevPerfilE" class="preview hidden" alt="Prévia perfil esquerdo" />
+          <div id="scorePerfilE" class="badge hidden"></div>
+        </div>
+
+        <div class="photoCard">
+          <div class="photoTitle">Perfil direito</div>
+          <input id="fotoPerfilD" type="file" accept="image/*" capture="environment" />
+          <img id="prevPerfilD" class="preview hidden" alt="Prévia perfil direito" />
+          <div id="scorePerfilD" class="badge hidden"></div>
+        </div>
+      </div>
+
+      <div class="row">
+        <button id="btnCalcular" class="btn primary" type="button">Calcular</button>
+        <button id="btnLimparFotos" class="btn secondary" type="button">Limpar fotos</button>
+      </div>
+
+      <h2 class="mt">3) Resultado</h2>
+      <div id="resultado" class="resultGrid">
+        <div class="resultCard">
+          <div class="k">IMC</div>
+          <div id="outImc" class="v">—</div>
+          <div id="outImcClass" class="s muted">—</div>
+        </div>
+
+        <div class="resultCard">
+          <div class="k">% Gordura (estimativa)</div>
+          <div id="outGord" class="v">—</div>
+          <div id="outGordNota" class="s muted">—</div>
+        </div>
+
+        <div class="resultCard">
+          <div class="k">IMG</div>
+          <div id="outImg" class="v">—</div>
+          <div class="s muted">Índice de Massa Gorda</div>
+        </div>
+
+        <div class="resultCard">
+          <div class="k">Massa gorda</div>
+          <div id="outGordaKg" class="v">—</div>
+          <div class="s muted">kg</div>
+        </div>
+
+        <div class="resultCard">
+          <div class="k">Massa magra</div>
+          <div id="outMagraKg" class="v">—</div>
+          <div class="s muted">kg</div>
+        </div>
+
+        <div class="resultCard">
+          <div class="k">Confiabilidade</div>
+          <div id="outConf" class="v">—</div>
+          <div id="outConfWhy" class="s muted">—</div>
+        </div>
+      </div>
+
+      <div class="row">
+        <button id="btnSalvar" class="btn primary" type="button">Salvar no histórico</button>
+        <button id="btnRelatorio" class="btn secondary" type="button">Gerar PDF (imprimir)</button>
+        <button id="btnExportar" class="btn secondary" type="button">Exportar CSV</button>
+      </div>
+
+      <div class="disclaimer">
+        <strong>Aviso:</strong> Este resultado é uma <em>estimativa</em> e pode divergir de métodos clínicos (DEXA, bioimpedância profissional, dobras cutâneas).
+      </div>
+    </section>
+
+    <!-- HISTÓRICO -->
+    <section id="tab-historico" class="card tabPane hidden">
+      <div class="row between">
+        <div>
+          <h2>Histórico do perfil</h2>
+          <p class="muted">Registros ficam salvos somente neste aparelho.</p>
+        </div>
+        <button id="btnApagar" class="btn danger" type="button">Apagar histórico</button>
+      </div>
+
+      <div id="histEmpty" class="muted">Sem registros ainda.</div>
+      <div id="histList" class="histList"></div>
+    </section>
+
+    <!-- CONFIG -->
+    <section id="tab-config" class="card tabPane hidden">
+      <h2>Configurações</h2>
+      <div class="grid">
+        <div class="resultCard">
+          <div class="k">Modo de teste</div>
+          <div class="s muted">
+            Esta versão prioriza velocidade de teste. Em versões futuras, dá para adicionar:
+            validação por pose estimation (MediaPipe), relatórios mais completos, backup na nuvem, etc.
+          </div>
+        </div>
+
+        <div class="resultCard">
+          <div class="k">Privacidade</div>
+          <div class="s muted">
+            Por padrão, fotos não são enviadas para servidor. Se você marcar “Salvar fotos”, elas ficam no seu aparelho (apenas para testes).
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <button id="btnResetTudo" class="btn danger" type="button">Apagar TUDO (perfis + histórico + fotos)</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL: Tutorial -->
+  <div id="modalTutorial" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modalCard">
+      <div class="row between">
+        <div>
+          <div class="modalTitle">Tutorial rápido de fotos</div>
+          <div class="muted">Para resultados mais consistentes</div>
+        </div>
+        <button id="btnCloseTutorial" class="btn secondary" type="button">Fechar</button>
+      </div>
+
+      <ol class="steps">
+        <li><strong>Luz:</strong> fique de frente para a luz (evite contraluz).</li>
+        <li><strong>Enquadramento:</strong> corpo inteiro (cabeça aos pés), pés visíveis.</li>
+        <li><strong>Distância:</strong> ~2–3m; câmera na altura do umbigo/peito.</li>
+        <li><strong>Postura:</strong> neutra, braços levemente afastados do tronco.</li>
+        <li><strong>Roupas:</strong> mais justas ajudam (opcional).</li>
+      </ol>
+
+      <div class="disclaimer small">
+        <strong>Aviso:</strong> o app fornece estimativas. Não use como diagnóstico clínico.
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
