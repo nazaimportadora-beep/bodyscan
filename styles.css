@@ -246,3 +246,23 @@ p{ margin: 8px 0; }
 .modalTitle{ font-size: 18px; font-weight: 900; }
 .steps{ margin: 12px 0 0; padding-left: 22px; }
 .steps li{ margin: 8px 0; }
+.fileBtn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:10px 14px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,.18);
+  background: rgba(255,255,255,.06);
+  cursor:pointer;
+  user-select:none;
+  gap:10px;
+}
+.fileBtn:hover{ background: rgba(255,255,255,.10); }
+.fileBtn input{ display:none; }
+
+.fileName{
+  margin-top:6px;
+  font-size:12px;
+  opacity:.75;
+}
